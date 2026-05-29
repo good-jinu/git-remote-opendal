@@ -1,0 +1,71 @@
+//! git-remote-opendal
+//!
+//! A Git remote helper that stores repository data on any storage backend
+//! supported by Apache OpenDAL (S3, GCS, Azure Blob, local fs, and many more).
+//!
+//! Git invokes this binary as:
+//!   `git-remote-opendal <remote-name> <url>`
+//!
+//! The URL format is:
+//!   `opendal://<scheme>/<root-path>`
+//!
+//! Additional backend configuration is read from git-config keys under the
+//! remote's section, e.g.:
+//!
+//!   [remote "origin"]
+//!       url = opendal://s3/my-git-repos/myrepo.git
+//!       opendal-bucket = my-bucket
+//!       opendal-region = us-east-1
+//!
+//! Or via environment variables (backend-specific, same as OpenDAL expects).
+
+mod config;
+mod helper;
+mod operator;
+mod protocol;
+mod storage;
+
+use anyhow::{Context, Result, bail};
+use tracing::debug;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    // Initialize tracing to stderr — git remote helpers must NEVER write
+    // protocol data to stderr, only stdout.  All our diagnostics go to stderr.
+    tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
+        .with_env_filter(
+            tracing_subscriber::EnvFilter::from_env("GIT_REMOTE_OPENDAL_LOG")
+                .add_directive(tracing::Level::WARN.into()),
+        )
+        .init();
+
+    let args: Vec<String> = std::env::args().collect();
+    debug!("invoked with args: {:?}", args);
+
+    // Git remote helpers receive: <program> <remote-name> <url>
+    // The remote-name may be absent in some invocations (e.g. direct test).
+    let (remote_name, url) = match args.len() {
+        3 => (args[1].clone(), args[2].clone()),
+        2 => (String::new(), args[1].clone()),
+        _ => bail!(
+            "Usage: git-remote-opendal <remote-name> <url>\n\
+             Got args: {:?}",
+            args
+        ),
+    };
+
+    let cfg = config::RemoteConfig::from_url_and_env(&url, &remote_name)
+        .context("Failed to parse remote configuration")?;
+
+    debug!("remote config: {:?}", cfg);
+
+    let op = operator::build_operator(&cfg)
+        .await
+        .context("Failed to initialize OpenDAL operator")?;
+
+    let mut h = helper::RemoteHelper::new(op, cfg);
+    h.run().await.context("Remote helper error")?;
+
+    Ok(())
+}
