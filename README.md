@@ -33,22 +33,86 @@ The helper implements the **`import`/`export`** capability pair:
 
 ## Requirements
 
-- Rust ≥ 1.85 (OpenDAL 0.56 MSRV)
 - Git ≥ 2.20
 
 ---
 
 ## Installation
 
-```bash
-cargo install --path .
-# Binary must be on PATH as 'git-remote-opendal'
+### Option 1 — Install script (recommended)
+
+The quickest way to get started on **macOS** and **Linux**:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/install.sh | sh
 ```
 
-Or copy the built binary to somewhere on your `$PATH`:
+This detects your platform, downloads the right pre-built binary from GitHub Releases, and optionally adds it to your `PATH`.
 
-```bash
+**Install a specific version:**
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/install.sh | sh -s -- v0.2.0
+```
+
+**Non-interactive (CI / scripts):**
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/install.sh | sh -s -- --yes
+```
+
+> The script supports `--no-modify-path` if you prefer to manage `PATH` yourself.
+
+---
+
+### Option 2 — Download a pre-built binary
+
+Download the archive for your platform from the
+[**Releases page**](https://github.com/good-jinu/git-remote-opendal/releases), then extract
+and place the binary somewhere on your `PATH`.
+
+| Platform | Archive |
+|----------|---------|
+| Linux x86\_64 | `git-remote-opendal-{version}-x86_64-unknown-linux-musl.tar.gz` |
+| Linux aarch64 | `git-remote-opendal-{version}-aarch64-unknown-linux-musl.tar.gz` |
+| macOS x86\_64 | `git-remote-opendal-{version}-x86_64-apple-darwin.tar.gz` |
+| macOS Apple Silicon | `git-remote-opendal-{version}-aarch64-apple-darwin.tar.gz` |
+| Windows x86\_64 | `git-remote-opendal-{version}-x86_64-pc-windows-msvc.zip` |
+
+Linux binaries are statically linked (musl) — no glibc dependency.
+
+```sh
+# Example for Linux x86_64
+VERSION=v0.1.0
+curl -fsSL "https://github.com/good-jinu/git-remote-opendal/releases/download/$VERSION/git-remote-opendal-$VERSION-x86_64-unknown-linux-musl.tar.gz" \
+  | tar -xz --strip-components=1 -C ~/.local/bin git-remote-opendal-$VERSION-x86_64-unknown-linux-musl/git-remote-opendal
+```
+
+Checksums are published alongside each release as `SHA256SUMS.txt`.
+
+---
+
+### Option 3 — Install via Cargo (crates.io)
+
+If you already have Rust and Cargo installed, you can install the binary directly from [crates.io](https://crates.io):
+
+```sh
+cargo install --locked git-remote-opendal
+```
+
+> **Note:** Requires Rust ≥ 1.85 (due to OpenDAL 0.56 MSRV). Make sure the Cargo binary directory (usually `~/.cargo/bin`) is in your `PATH`.
+
+---
+
+### Option 4 — Build from source
+
+To build and install the binary directly from the source repository:
+
+```sh
+git clone https://github.com/good-jinu/git-remote-opendal
+cd git-remote-opendal
 cargo build --release
+# Copy the binary to a directory on your PATH, for example:
 cp target/release/git-remote-opendal ~/.local/bin/
 ```
 
