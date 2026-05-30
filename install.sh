@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright the git-remote-opendal authors. Apache-2.0 license.
+# Copyright the git-remote-opendal authors. MIT license.
 # Install git-remote-opendal – a Git remote helper backed by Apache OpenDAL.
 #
 # Usage:
