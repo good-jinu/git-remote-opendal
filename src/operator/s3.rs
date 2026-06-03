@@ -17,7 +17,7 @@
 //! export OPENDAL_S3_BUCKET=my-git-bucket
 //!
 //! # Via git config
-//! git config opendal.s3.bucket my-git-bucket
+//! git config remote.<name>.opendalS3Bucket my-git-bucket
 //! ```
 
 use crate::config::RemoteConfig;

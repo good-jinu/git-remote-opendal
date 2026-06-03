@@ -19,10 +19,10 @@ use anyhow::{Context, Result, bail};
 use opendal::Operator;
 use std::io;
 use std::process::{Command as SysCommand, Stdio};
-use std::time::{SystemTime, UNIX_EPOCH};
 use tracing::{debug, info, warn};
 
 const REFSPEC: &str = "refs/heads/*:refs/heads/*";
+const REFSPEC_TAGS: &str = "refs/tags/*:refs/tags/*";
 
 pub struct RemoteHelper {
     storage: Storage,
@@ -108,6 +108,7 @@ impl RemoteHelper {
         protocol::write_line("push")?;
         protocol::write_line("option")?;
         protocol::write_line(&format!("refspec {}", REFSPEC))?;
+        protocol::write_line(&format!("refspec {}", REFSPEC_TAGS))?;
         protocol::write_blank()?;
         Ok(())
     }
@@ -162,8 +163,7 @@ impl RemoteHelper {
             return Ok(());
         }
 
-        let tmp_dir = std::env::temp_dir().join(format!("git-remote-opendal-{}", process_id()));
-        std::fs::create_dir_all(&tmp_dir)?;
+        let tmp_dir = tempfile::tempdir().context("Failed to create temp directory")?;
 
         for bundle_key in &store.bundles {
             let data = self
@@ -172,7 +172,7 @@ impl RemoteHelper {
                 .await
                 .with_context(|| format!("Failed to download bundle: {}", bundle_key))?;
 
-            let bundle_path = tmp_dir.join("current.bundle");
+            let bundle_path = tmp_dir.path().join("current.bundle");
             std::fs::write(&bundle_path, &data)?;
 
             let status = SysCommand::new("git")
@@ -186,8 +186,6 @@ impl RemoteHelper {
                 bail!("'git bundle unbundle' failed with status {:?}", status);
             }
         }
-
-        let _ = std::fs::remove_dir_all(&tmp_dir);
 
         protocol::write_raw(b"feature done\n")?;
 
@@ -223,6 +221,7 @@ impl RemoteHelper {
         let mut store = self.storage.load_refs().await?;
         let mut updated_refs: std::collections::HashMap<String, String> =
             std::collections::HashMap::new();
+        let mut push_details: Vec<(String, String, String, bool)> = Vec::new();
 
         for (src, dst) in pushes {
             if src.is_empty() {
@@ -231,8 +230,22 @@ impl RemoteHelper {
                 protocol::write_line(&format!("error {} deletion not supported", dst))?;
                 continue;
             }
-            let sha = self.resolve_ref(src)?;
-            updated_refs.insert(dst.clone(), sha);
+
+            let force = src.starts_with('+');
+            let src_ref = if force { &src[1..] } else { src };
+            let sha = self.resolve_ref(src_ref)?;
+
+            // Non-fast-forward check (Issue 4)
+            if let Some(old_sha) = store.refs.get(dst) {
+                if !force && !self.is_fast_forward(old_sha, &sha)? {
+                    warn!("push: non-fast-forward for '{}' rejected", dst);
+                    protocol::write_line(&format!("error {} non-fast-forward", dst))?;
+                    continue;
+                }
+            }
+
+            updated_refs.insert(dst.clone(), sha.clone());
+            push_details.push((src_ref.to_string(), dst.clone(), sha, force));
         }
 
         if updated_refs.is_empty() {
@@ -240,18 +253,22 @@ impl RemoteHelper {
             return Ok(());
         }
 
-        let bundle_name = format!("{:016x}", timestamp_ms());
-        let tmp_bundle = std::env::temp_dir().join(format!(
-            "git-remote-opendal-{}-{}.bundle",
-            process_id(),
-            bundle_name
-        ));
+        // Use UUID to avoid collisions (Issue 1)
+        let bundle_name = uuid::Uuid::new_v4().to_string();
+        let tmp_bundle =
+            tempfile::NamedTempFile::new().context("Failed to create temp bundle file")?;
 
         let mut bundle_cmd = SysCommand::new("git");
-        bundle_cmd.arg("bundle").arg("create").arg(&tmp_bundle);
-        for ref_name in updated_refs.keys() {
-            bundle_cmd.arg(ref_name);
+        bundle_cmd
+            .arg("bundle")
+            .arg("create")
+            .arg(tmp_bundle.path());
+
+        // Use SRC ref names for bundle creation (Issue 2)
+        for (src_ref, _, _, _) in &push_details {
+            bundle_cmd.arg(src_ref);
         }
+
         // Exclude commits the remote already has so bundles stay incremental.
         for old_sha in store.refs.values() {
             bundle_cmd.arg(format!("^{}", old_sha));
@@ -266,8 +283,8 @@ impl RemoteHelper {
             bail!("'git bundle create' failed");
         }
 
-        let bundle_data = std::fs::read(&tmp_bundle).context("Failed to read bundle")?;
-        let _ = std::fs::remove_file(&tmp_bundle);
+        let bundle_data = std::fs::read(tmp_bundle.path()).context("Failed to read bundle")?;
+        // tmp_bundle will be deleted when dropped (Issue 7)
 
         let bundle_key = self
             .storage
@@ -286,6 +303,15 @@ impl RemoteHelper {
 
         info!("push: {} ref(s) updated", updated_refs.len());
         Ok(())
+    }
+
+    fn is_fast_forward(&self, old_sha: &str, new_sha: &str) -> Result<bool> {
+        let status = SysCommand::new("git")
+            .args(["merge-base", "--is-ancestor", old_sha, new_sha])
+            .status()
+            .context("Failed to run git merge-base")?;
+
+        Ok(status.success())
     }
 
     fn resolve_ref(&self, refname: &str) -> Result<String> {
@@ -308,24 +334,32 @@ impl RemoteHelper {
 
     fn handle_option(&self, key: &str, val: &str) -> Result<()> {
         debug!("option: {}={}", key, val);
-        match key {
-            "verbosity" => protocol::write_line("ok")?,
-            "progress" => protocol::write_line("ok")?,
-            _ => protocol::write_line("unsupported")?,
-        }
+        protocol::write_line(option_response(key))?;
         Ok(())
     }
 }
 
 // ─── Utilities ───────────────────────────────────────────────────────────────
 
-fn process_id() -> u32 {
-    std::process::id()
+fn option_response(key: &str) -> &'static str {
+    match key {
+        "verbosity" => "ok",
+        "progress" => "unsupported",
+        _ => "unsupported",
+    }
 }
 
-fn timestamp_ms() -> u128 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_millis()
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn progress_option_is_unsupported() {
+        assert_eq!(option_response("progress"), "unsupported");
+    }
+
+    #[test]
+    fn verbosity_option_is_supported() {
+        assert_eq!(option_response("verbosity"), "ok");
+    }
 }

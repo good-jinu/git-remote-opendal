@@ -17,10 +17,12 @@ Core components (read across these files to understand flows):
   (`OPENDAL_<SCHEME>_<KEY>`). Keys used inside code are lowercase-hyphenated
   (e.g. `access-key-id`, `credential-path`). See `collect_git_params` and
   `collect_env_params` for exact behavior.
-- `src/operator.rs` — constructs `opendal::Operator` per scheme. Supported
-  schemes: `s3`, `gcs`, `azblob`, `gdrive`, `fs`, `memory`. To add a backend:
-  1) enable the service feature in `Cargo.toml`; 2) add `build_<scheme>`;
-  3) add an arm in `build_operator`.
+- `src/operator.rs` — constructs `opendal::Operator` per scheme. User-facing
+  schemes: `s3`, `gcs`, `azblob`, `gdrive`, `fs`. The `memory` scheme exists
+  only for unit tests / single-process debugging and should not be documented
+  as a normal backend. To add a backend: 1) enable the service feature in
+  `Cargo.toml`; 2) add `build_<scheme>`; 3) add an arm in `build_operator`;
+  4) update `USER_SUPPORTED_SCHEMES` and README if it is user-facing.
 - `src/storage.rs` — storage layout and helpers. Important layout:
 
   info/refs.json  — JSON { refs: {"refs/heads/...": "<sha>"}, bundles: ["objects/....bundle"] }
@@ -31,7 +33,7 @@ Core components (read across these files to understand flows):
 - `src/protocol.rs` — small parser/writer for Git remote helper line protocol.
   Use `write_raw` for fast-import data and `write_line` / `write_blank` for
   protocol lines. Note: diagnostics MUST go to stderr (see tracing setup).
-- `src/helper.rs` — main protocol state machine implementing `import`/`export`.
+- `src/helper.rs` — main protocol state machine implementing `import`/`push`.
   Push flow uses `git fast-import`/`git bundle create` and uploads bundles.
   Fetch flow downloads bundles and runs `git bundle unbundle` then emits a
   fast-import stream. Both flows rely on the `git` binary being present.
@@ -42,6 +44,9 @@ Developer workflows (commands discovered from README / files):
   cargo install --path .
   # or for local debugging
   cargo build --release
+
+- Formatting:
+  cargo fmt --check
 
 - Tests: run unit tests (module tests exist in several files):
   cargo test
@@ -64,13 +69,21 @@ Project-specific conventions and gotchas:
   mapped to lowercase-hyphenated keys internally. See `normalize_git_param_key`.
 - Logging: tracing is configured to write to stderr intentionally. Do not
   write protocol data to stderr — it will break Git's protocol (see main.rs).
+- Capabilities: branch and tag refspecs are both advertised. If refspec
+  behavior changes, update `handle_capabilities` and fetch/push behavior
+  together.
+- Options: `option progress` is intentionally reported as `unsupported` unless
+  real progress messages are emitted on stdout according to the remote-helper
+  protocol.
 - Storage layout: `refs.json` contains the canonical list of refs and the
   ordered list of bundle keys. Concurrent pushes use a last-writer-wins
   strategy — there's no server-side locking implemented.
-- Temporary files: imports/exports use the system temp dir and `git bundle`
+- Temporary files: imports/pushes use `tempfile` RAII cleanup plus `git bundle`
   tooling. The helper assumes `git` is available on PATH and that subprocess
   calls to `git` succeed; update `helper.rs` if you need platform-specific
   adjustments.
+- Tests that mutate environment variables should use `serial_test`, because env
+  vars are process-global and Rust tests run in parallel by default.
 
 Extensibility notes (common edits you may be asked to make):
 

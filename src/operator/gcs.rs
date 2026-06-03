@@ -14,7 +14,7 @@
 //! export OPENDAL_GCS_BUCKET=my-git-bucket
 //!
 //! # Via git config
-//! git config opendal.gcs.bucket my-git-bucket
+//! git config remote.<name>.opendalGcsBucket my-git-bucket
 //! ```
 
 use crate::config::RemoteConfig;
