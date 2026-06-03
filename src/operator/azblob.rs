@@ -14,7 +14,7 @@
 //! export OPENDAL_AZBLOB_CONTAINER=my-git-container
 //!
 //! # Via git config
-//! git config opendal.azblob.container my-git-container
+//! git config remote.<name>.opendalAzblobContainer my-git-container
 //! ```
 
 use crate::config::RemoteConfig;

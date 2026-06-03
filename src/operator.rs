@@ -17,6 +17,8 @@ mod gdrive;
 mod memory;
 mod s3;
 
+const USER_SUPPORTED_SCHEMES: &str = "s3, gcs, azblob, gdrive, fs";
+
 /// Build a configured [`Operator`] for the remote.
 pub async fn build_operator(cfg: &RemoteConfig) -> Result<Operator> {
     debug!("scheme={} root={}", cfg.scheme, cfg.root);
@@ -29,7 +31,7 @@ pub async fn build_operator(cfg: &RemoteConfig) -> Result<Operator> {
         "fs" => fs::build_fs(cfg)?,
         "memory" => memory::build_memory()?,
         other => bail!(
-            "Unsupported scheme '{other}'. Supported: s3, gcs, azblob, gdrive, fs, memory.\n\
+            "Unsupported scheme '{other}'. Supported: {USER_SUPPORTED_SCHEMES}.\n\
              Enable the matching 'services-<name>' feature and add a branch in operator.rs."
         ),
     };
@@ -38,3 +40,14 @@ pub async fn build_operator(cfg: &RemoteConfig) -> Result<Operator> {
 }
 
 // No helper traits required — per-backend builders return `Result<Operator>` directly.
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn user_supported_schemes_do_not_advertise_memory() {
+        assert_eq!(USER_SUPPORTED_SCHEMES, "s3, gcs, azblob, gdrive, fs");
+        assert!(!USER_SUPPORTED_SCHEMES.contains("memory"));
+    }
+}

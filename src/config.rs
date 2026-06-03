@@ -328,9 +328,20 @@ fn to_camel_case_first(s: &str) -> String {
 }
 
 /// Escape the characters that are special in the git config regex dialect
-/// (basically just `.`).
+/// (POSIX Basic Regular Expressions).
+/// Special characters in BRE: . * [ ^ $ \
 fn regex_escape(s: &str) -> String {
-    s.replace('.', r"\.")
+    let mut escaped = String::with_capacity(s.len() * 2);
+    for c in s.chars() {
+        match c {
+            '.' | '*' | '[' | '^' | '$' | '\\' => {
+                escaped.push('\\');
+                escaped.push(c);
+            }
+            _ => escaped.push(c),
+        }
+    }
+    escaped
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
@@ -338,6 +349,7 @@ fn regex_escape(s: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serial_test::serial;
 
     #[test]
     fn parse_s3_url() {
@@ -385,6 +397,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn env_params_collected() {
         // Temporarily set a fake env var.
         unsafe {
@@ -401,7 +414,8 @@ mod tests {
     }
 
     #[test]
-    fn regex_escape_dots() {
+    fn regex_escape_special_chars() {
         assert_eq!(regex_escape("remote.origin."), r"remote\.origin\.");
+        assert_eq!(regex_escape(r"a.b*c[d^e$f\g"), r"a\.b\*c\[d\^e\$f\\g");
     }
 }

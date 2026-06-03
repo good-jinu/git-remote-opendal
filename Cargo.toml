@@ -39,11 +39,21 @@ bytes = "1"
 anyhow = "1"
 thiserror = "1"
 
+# Unique identifiers
+uuid = { version = "1", features = ["v4"] }
+
+# Temp files and directories
+tempfile = "3"
+
 # Logging to stderr (safe for git remote helpers — git reads stdout only)
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # Process spawning for git fast-import / fast-export uses std::process only.
+
+[dev-dependencies]
+# Serializing tests that mutate process-global environment variables
+serial_test = "3"
 
 [profile.release]
 opt-level = 3

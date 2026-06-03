@@ -13,7 +13,7 @@
 //! export OPENDAL_GDRIVE_CLIENT_ID=my-client-id
 //!
 //! # Via git config
-//! git config opendal.gdrive.clientId my-client-id
+//! git config remote.<name>.opendalGdriveClientId my-client-id
 //! ```
 
 use crate::config::RemoteConfig;

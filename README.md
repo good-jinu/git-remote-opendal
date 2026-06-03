@@ -128,8 +128,12 @@ opendal://<scheme>/<root-path>
 
 | Part | Description |
 |------|-------------|
-| `scheme` | OpenDAL backend: `s3`, `gcs`, `azblob`, `fs`, `memory` |
+| `scheme` | OpenDAL backend: `s3`, `gcs`, `azblob`, `gdrive`, `fs` |
 | `root-path` | Path inside the backend that acts as the repository root |
+
+The `memory` backend exists only for unit tests and single-process debugging.
+It is not suitable for normal Git operations because each helper invocation gets
+an isolated in-memory store.
 
 ### Backend configuration
 
