@@ -155,7 +155,7 @@ This keeps credentials out of git-config and out of repository history.
 # Configure the remote
 git remote add origin opendal://s3/my-git-repos/myrepo.git
 
-# Set credentials (never in git-config!)
+# Set credentials
 export OPENDAL_S3_BUCKET=my-git-bucket
 export OPENDAL_S3_REGION=us-east-1
 export AWS_ACCESS_KEY_ID=AKIA...

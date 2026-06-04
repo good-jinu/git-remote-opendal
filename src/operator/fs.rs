@@ -7,7 +7,7 @@ use crate::config::RemoteConfig;
 use anyhow::Result;
 use opendal::Operator;
 
-/// Build a Fs `Operator` from the merged `RemoteConfig`.
+/// Build a Fs `Operator` from the `RemoteConfig`.
 pub fn build_fs(cfg: &RemoteConfig) -> Result<Operator> {
     use opendal::services::Fs;
     use tracing::debug;

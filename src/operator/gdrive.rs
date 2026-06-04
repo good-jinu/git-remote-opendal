@@ -6,21 +6,17 @@
 //!
 //! # Configuration
 //!
-//! Configuration can be provided via environment variables or git config:
+//! Configuration is provided via environment variables:
 //!
 //! ```bash
-//! # Via environment variable
 //! export OPENDAL_GDRIVE_CLIENT_ID=my-client-id
-//!
-//! # Via git config
-//! git config remote.<name>.opendalGdriveClientId my-client-id
 //! ```
 
 use crate::config::RemoteConfig;
 use anyhow::Result;
 use opendal::Operator;
 
-/// Build a Google Drive `Operator` from the merged `RemoteConfig`.
+/// Build a Google Drive `Operator` from the `RemoteConfig`.
 pub fn build_gdrive(cfg: &RemoteConfig) -> Result<Operator> {
     use opendal::services::Gdrive;
     use tracing::debug;

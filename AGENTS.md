@@ -12,10 +12,9 @@ Core components (read across these files to understand flows):
 
 - `src/main.rs` — CLI entry, tracing config (logs go to stderr), builds the
   OpenDAL operator, starts `helper::RemoteHelper`.
-- `src/config.rs` — URL parsing and parameter resolution. Priority: git config
-  (remote.<name>.opendal<Scheme><Param>) > environment variables
-  (`OPENDAL_<SCHEME>_<KEY>`). Keys used inside code are lowercase-hyphenated
-  (e.g. `access-key-id`, `credential-path`). See `collect_git_params` and
+- `src/config.rs` — URL parsing and parameter resolution. Backend parameters
+  come from environment variables (`OPENDAL_<SCHEME>_<KEY>`). Keys used inside
+  code are lowercase-hyphenated (e.g. `access-key-id`, `credential-path`). See
   `collect_env_params` for exact behavior.
 - `src/operator.rs` — constructs `opendal::Operator` per scheme. User-facing
   schemes: `s3`, `gcs`, `azblob`, `gdrive`, `fs`. The `memory` scheme exists
@@ -62,11 +61,9 @@ Developer workflows (commands discovered from README / files):
 
 Project-specific conventions and gotchas:
 
-- Config precedence: git config entries under `remote.<name>.opendal<Scheme><Param>` win
-  over `OPENDAL_<SCHEME>_<KEY>` env vars. `config.rs` implements this via
-  `git config --get-regexp` — changes to that code affect precedence.
-- Param naming: git keys are camelCase suffixes in `.git/config` but are
-  mapped to lowercase-hyphenated keys internally. See `normalize_git_param_key`.
+- Config resolution: backend parameters come only from
+  `OPENDAL_<SCHEME>_<KEY>` env vars. `config.rs` maps env var suffixes to
+  lowercase-hyphenated keys internally.
 - Logging: tracing is configured to write to stderr intentionally. Do not
   write protocol data to stderr — it will break Git's protocol (see main.rs).
 - Capabilities: branch and tag refspecs are both advertised. If refspec
