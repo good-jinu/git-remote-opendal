@@ -2,26 +2,22 @@
 //!
 //! Contains `build_gcs` which constructs an operator for Google Cloud Storage.
 //!
-//! Required param: `bucket` (`OPENDAL_GCS_BUCKET` / `opendalGcsBucket`). Optional:
+//! Required param: `bucket` (`OPENDAL_GCS_BUCKET`). Optional:
 //! `credential`, `credential-path`, `endpoint`.
 //!
 //! # Configuration
 //!
-//! Configuration can be provided via environment variables or git config:
+//! Configuration is provided via environment variables:
 //!
 //! ```bash
-//! # Via environment variable
 //! export OPENDAL_GCS_BUCKET=my-git-bucket
-//!
-//! # Via git config
-//! git config remote.<name>.opendalGcsBucket my-git-bucket
 //! ```
 
 use crate::config::RemoteConfig;
 use anyhow::Result;
 use opendal::Operator;
 
-/// Build a GCS `Operator` from the merged `RemoteConfig`.
+/// Build a GCS `Operator` from the `RemoteConfig`.
 pub fn build_gcs(cfg: &RemoteConfig) -> Result<Operator> {
     use anyhow::anyhow;
     use opendal::services::Gcs;

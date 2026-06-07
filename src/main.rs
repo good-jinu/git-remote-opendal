@@ -9,15 +9,8 @@
 //! The URL format is:
 //!   `opendal://<scheme>/<root-path>`
 //!
-//! Additional backend configuration is read from git-config keys under the
-//! remote's section, e.g.:
-//!
-//!   [remote "origin"]
-//!       url = opendal://s3/my-git-repos/myrepo.git
-//!       opendal-bucket = my-bucket
-//!       opendal-region = us-east-1
-//!
-//! Or via environment variables (backend-specific, same as OpenDAL expects).
+//! Additional backend configuration is read from environment variables using
+//! the `OPENDAL_<SCHEME>_<KEY>` pattern.
 
 mod config;
 mod helper;
@@ -45,9 +38,9 @@ async fn main() -> Result<()> {
 
     // Git remote helpers receive: <program> <remote-name> <url>
     // The remote-name may be absent in some invocations (e.g. direct test).
-    let (remote_name, url) = match args.len() {
-        3 => (args[1].clone(), args[2].clone()),
-        2 => (String::new(), args[1].clone()),
+    let url = match args.len() {
+        3 => args[2].clone(),
+        2 => args[1].clone(),
         _ => bail!(
             "Usage: git-remote-opendal <remote-name> <url>\n\
              Got args: {:?}",
@@ -55,7 +48,7 @@ async fn main() -> Result<()> {
         ),
     };
 
-    let cfg = config::RemoteConfig::from_url_and_env(&url, &remote_name)
+    let cfg = config::RemoteConfig::from_url_and_env(&url)
         .context("Failed to parse remote configuration")?;
 
     debug!("remote config: {:?}", cfg);

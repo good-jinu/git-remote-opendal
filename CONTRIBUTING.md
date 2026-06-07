@@ -105,16 +105,11 @@ fn build_webdav(cfg: &RemoteConfig) -> Result<Operator> {
 
 ## Project Conventions
 
-### Config / parameter precedence
+### Config / parameter resolution
 
-Parameters are resolved in this order (highest priority first):
+Parameters are resolved via **Environment variables** — `OPENDAL_<SCHEME>_<KEY>`.
 
-1. **git config** — entries under `remote.<name>.opendal<Scheme><Param>`
-2. **Environment variables** — `OPENDAL_<SCHEME>_<KEY>`
-
-Keys are stored internally as lowercase-hyphenated strings (e.g.
-`access-key-id`).  Git config uses camelCase suffixes which are normalised by
-`normalize_git_param_key` in [`src/config.rs`](src/config.rs).
+Keys are stored internally as lowercase-hyphenated strings (e.g. `access-key-id`).
 
 ### Logging
 

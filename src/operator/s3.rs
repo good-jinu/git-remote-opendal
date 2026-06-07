@@ -4,27 +4,22 @@
 //! `opendal::Operator` configured for S3-compatible services (AWS S3,
 //! MinIO, Cloudflare R2, etc.).
 //!
-//! Required parameter (env or git-config): `bucket` (canonical key
-//! `OPENDAL_S3_BUCKET` / git `opendalS3Bucket`). Optional params:
+//! Required parameter: `bucket` (`OPENDAL_S3_BUCKET`). Optional params:
 //! `region`, `endpoint`, `access-key-id`, `secret-access-key`.
 //!
 //! # Configuration
 //!
-//! Configuration can be provided via environment variables or git config:
+//! Configuration is provided via environment variables:
 //!
 //! ```bash
-//! # Via environment variable
 //! export OPENDAL_S3_BUCKET=my-git-bucket
-//!
-//! # Via git config
-//! git config remote.<name>.opendalS3Bucket my-git-bucket
 //! ```
 
 use crate::config::RemoteConfig;
 use anyhow::Result;
 use opendal::Operator;
 
-/// Build an S3 `Operator` from the merged `RemoteConfig`.
+/// Build an S3 `Operator` from the `RemoteConfig`.
 ///
 /// Examples of config keys used:
 /// - `bucket` (required)

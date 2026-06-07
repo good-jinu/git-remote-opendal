@@ -2,26 +2,22 @@
 //!
 //! Contains `build_azblob` which constructs an operator for Azure Blob Storage.
 //!
-//! Required param: `container` (`OPENDAL_AZBLOB_CONTAINER` / `opendalAzblobContainer`).
+//! Required param: `container` (`OPENDAL_AZBLOB_CONTAINER`).
 //! Optional: `account-name`, `account-key`, `endpoint`.
 //!
 //! # Configuration
 //!
-//! Configuration can be provided via environment variables or git config:
+//! Configuration is provided via environment variables:
 //!
 //! ```bash
-//! # Via environment variable
 //! export OPENDAL_AZBLOB_CONTAINER=my-git-container
-//!
-//! # Via git config
-//! git config remote.<name>.opendalAzblobContainer my-git-container
 //! ```
 
 use crate::config::RemoteConfig;
 use anyhow::Result;
 use opendal::Operator;
 
-/// Build an Azblob `Operator` from the merged `RemoteConfig`.
+/// Build an Azblob `Operator` from the `RemoteConfig`.
 pub fn build_azblob(cfg: &RemoteConfig) -> Result<Operator> {
     use anyhow::anyhow;
     use opendal::services::Azblob;
