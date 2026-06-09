@@ -49,6 +49,9 @@ tempfile = "3"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
+# Cross-platform masked terminal input (/dev/tty on Unix, SetConsoleMode on Windows)
+rpassword = "7"
+
 # Process spawning for git fast-import / fast-export uses std::process only.
 
 [dev-dependencies]

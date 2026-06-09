@@ -13,6 +13,7 @@
 //! the `OPENDAL_<SCHEME>_<KEY>` pattern.
 
 mod config;
+mod credentials;
 mod helper;
 mod operator;
 mod protocol;
@@ -48,8 +49,11 @@ async fn main() -> Result<()> {
         ),
     };
 
-    let cfg = config::RemoteConfig::from_url_and_env(&url)
+    let mut cfg = config::RemoteConfig::from_url_and_env(&url)
         .context("Failed to parse remote configuration")?;
+
+    credentials::resolve(&mut cfg)
+        .context("Failed to resolve backend credentials")?;
 
     debug!("remote config: {:?}", cfg);
 
