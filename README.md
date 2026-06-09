@@ -52,7 +52,7 @@ This detects your platform, downloads the right pre-built binary from GitHub Rel
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/install.sh | sh -s -- v0.2.0
+curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/install.sh | sh -s -- v0.2.1
 ```
 
 **Non-interactive (CI / scripts):**
