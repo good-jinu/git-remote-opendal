@@ -13,6 +13,10 @@
 //!
 //! ```bash
 //! export OPENDAL_S3_BUCKET=my-git-bucket
+//! export OPENDAL_S3_REGION=us-east-1
+//! export OPENDAL_S3_ENDPOINT=https://s3.amazonaws.com
+//! export OPENDAL_S3_ACCESS_KEY_ID=access_key
+//! export OPENDAL_S3_SECRET_ACCESS_KEY=secret_key
 //! ```
 
 use crate::config::RemoteConfig;

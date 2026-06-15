@@ -158,19 +158,14 @@ git remote add origin opendal://s3/my-git-repos/myrepo.git
 # Set credentials
 export OPENDAL_S3_BUCKET=my-git-bucket
 export OPENDAL_S3_REGION=us-east-1
-export AWS_ACCESS_KEY_ID=AKIA...
-export AWS_SECRET_ACCESS_KEY=...
+export OPENDAL_S3_ACCESS_KEY_ID=AKIA...
+export OPENDAL_S3_SECRET_ACCESS_KEY=...
+# Optional for S3-compatible endpoints (MinIO, R2, etc.):
+export OPENDAL_S3_ENDPOINT=https://my-minio.example.com
 
 # Use normally
 git push origin main
 git clone opendal://s3/my-git-repos/myrepo.git
-```
-
-For S3-compatible endpoints (MinIO, R2, etc.):
-
-```bash
-export OPENDAL_S3_ENDPOINT=https://my-minio.example.com
-export OPENDAL_S3_REGION=us-east-1   # required even for MinIO
 ```
 
 ---
@@ -181,8 +176,10 @@ export OPENDAL_S3_REGION=us-east-1   # required even for MinIO
 git remote add origin opendal://gcs/my-git-repos/myrepo.git
 
 export OPENDAL_GCS_BUCKET=my-gcs-bucket
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
-# or: export OPENDAL_GCS_CREDENTIAL=$(base64 service-account.json)
+export OPENDAL_GCS_CREDENTIAL_PATH=/path/to/service-account.json
+# or: export OPENDAL_GCS_CREDENTIAL=raw_json_string
+# Optional:
+export OPENDAL_GCS_ENDPOINT=https://storage.googleapis.com
 
 git push origin main
 ```
@@ -197,6 +194,8 @@ git remote add origin opendal://azblob/my-git-repos/myrepo.git
 export OPENDAL_AZBLOB_CONTAINER=my-git-container
 export OPENDAL_AZBLOB_ACCOUNT_NAME=myaccount
 export OPENDAL_AZBLOB_ACCOUNT_KEY=...
+# Optional:
+export OPENDAL_AZBLOB_ENDPOINT=https://myaccount.blob.core.windows.net
 
 git push origin main
 ```
@@ -210,6 +209,21 @@ git remote add origin opendal://fs/tmp/my-bare-repos/myrepo.git
 
 git push origin main
 git clone opendal://fs/tmp/my-bare-repos/myrepo.git local-clone
+```
+
+---
+
+### Google Drive
+
+```bash
+git remote add origin opendal://gdrive/my-git-repos/myrepo.git
+
+export OPENDAL_GDRIVE_CLIENT_ID=my-client-id
+export OPENDAL_GDRIVE_CLIENT_SECRET=my-client-secret
+export OPENDAL_GDRIVE_REFRESH_TOKEN=my-refresh-token
+export OPENDAL_GDRIVE_ACCESS_TOKEN=my-access-token
+
+git push origin main
 ```
 
 ---

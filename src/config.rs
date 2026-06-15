@@ -14,6 +14,20 @@
 //! You can configure any backend using environment variables following the
 //! `OPENDAL_<SCHEME>_<KEY>` pattern.
 //!
+//! ### General Examples
+//!
+//! ```bash
+//! # S3 Example
+//! export OPENDAL_S3_BUCKET=my-bucket
+//! export OPENDAL_S3_REGION=us-east-1
+//! export OPENDAL_S3_ACCESS_KEY_ID=AKIA...
+//! export OPENDAL_S3_SECRET_ACCESS_KEY=...
+//!
+//! # GCS Example
+//! export OPENDAL_GCS_BUCKET=my-bucket
+//! export OPENDAL_GCS_CREDENTIAL_PATH=/path/to/key.json
+//! ```
+//!
 //! | Backend | Variable | Description |
 //! | :--- | :--- | :--- |
 //! | **S3** | `OPENDAL_S3_BUCKET` | **Required.** The S3 bucket name. |

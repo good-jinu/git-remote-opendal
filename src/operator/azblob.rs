@@ -11,6 +11,9 @@
 //!
 //! ```bash
 //! export OPENDAL_AZBLOB_CONTAINER=my-git-container
+//! export OPENDAL_AZBLOB_ACCOUNT_NAME=account_name
+//! export OPENDAL_AZBLOB_ACCOUNT_KEY=account_key
+//! export OPENDAL_AZBLOB_ENDPOINT=https://account_name.blob.core.windows.net
 //! ```
 
 use crate::config::RemoteConfig;
