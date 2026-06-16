@@ -10,6 +10,9 @@
 //!
 //! ```bash
 //! export OPENDAL_GDRIVE_CLIENT_ID=my-client-id
+//! export OPENDAL_GDRIVE_CLIENT_SECRET=my-client-secret
+//! export OPENDAL_GDRIVE_REFRESH_TOKEN=my-refresh-token
+//! export OPENDAL_GDRIVE_ACCESS_TOKEN=my-access-token
 //! ```
 
 use crate::config::RemoteConfig;

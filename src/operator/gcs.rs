@@ -11,6 +11,9 @@
 //!
 //! ```bash
 //! export OPENDAL_GCS_BUCKET=my-git-bucket
+//! export OPENDAL_GCS_CREDENTIAL=credential_json
+//! export OPENDAL_GCS_CREDENTIAL_PATH=/path/to/credential
+//! export OPENDAL_GCS_ENDPOINT=https://storage.googleapis.com
 //! ```
 
 use crate::config::RemoteConfig;
