@@ -61,6 +61,7 @@ impl RemoteConfig {
 
         // Environment variables OPENDAL_<SCHEME>_<KEY>
         let params = collect_env_params(&scheme);
+        let (root, params) = inject_url_params(&scheme, &root, params)?;
 
         debug!(
             "config resolved: scheme={scheme}, root={root}, params={:?}",
@@ -73,6 +74,50 @@ impl RemoteConfig {
             params,
         })
     }
+}
+
+fn inject_url_params(
+    scheme: &str,
+    root: &str,
+    mut params: HashMap<String, String>,
+) -> Result<(String, HashMap<String, String>)> {
+    let required_key = match scheme {
+        "s3" | "gcs" => Some("bucket"),
+        "azblob" => Some("container"),
+        _ => None,
+    };
+
+    let Some(required_key) = required_key else {
+        return Ok((root.to_string(), params));
+    };
+
+    let value = root
+        .trim_start_matches('/')
+        .split('/')
+        .next()
+        .unwrap_or("");
+
+    if value.is_empty() {
+        bail!(
+            "URL must include a {} for scheme '{}', e.g. opendal://{}/<{}>/path",
+            required_key,
+            scheme,
+            scheme,
+            required_key
+        );
+    }
+
+    if !params.contains_key(required_key) {
+        params.insert(required_key.to_string(), value.to_string());
+    }
+
+    let stripped_root = root
+        .trim_start_matches('/')
+        .split_once('/')
+        .map(|(_, rest)| format!("/{}", rest))
+        .unwrap_or_else(|| "/".to_string());
+
+    Ok((stripped_root, params))
 }
 
 // ─── URL parsing ─────────────────────────────────────────────────────────────
@@ -128,6 +173,30 @@ mod tests {
     }
 
     #[test]
+    fn from_url_and_env_extracts_s3_bucket_from_path() {
+        let cfg = RemoteConfig::from_url_and_env("opendal://s3/my-bucket/repos/myrepo.git").unwrap();
+        assert_eq!(cfg.scheme, "s3");
+        assert_eq!(cfg.root, "/repos/myrepo.git");
+        assert_eq!(cfg.params.get("bucket").map(String::as_str), Some("my-bucket"));
+    }
+
+    #[test]
+    fn from_url_and_env_extracts_gcs_bucket_from_path() {
+        let cfg = RemoteConfig::from_url_and_env("opendal://gcs/my-bucket/repos/myrepo.git").unwrap();
+        assert_eq!(cfg.scheme, "gcs");
+        assert_eq!(cfg.root, "/repos/myrepo.git");
+        assert_eq!(cfg.params.get("bucket").map(String::as_str), Some("my-bucket"));
+    }
+
+    #[test]
+    fn from_url_and_env_extracts_azblob_container_from_path() {
+        let cfg = RemoteConfig::from_url_and_env("opendal://azblob/my-container/repos/myrepo.git").unwrap();
+        assert_eq!(cfg.scheme, "azblob");
+        assert_eq!(cfg.root, "/repos/myrepo.git");
+        assert_eq!(cfg.params.get("container").map(String::as_str), Some("my-container"));
+    }
+
+    #[test]
     fn parse_fs_url() {
         let (scheme, root) = parse_url("opendal://fs/tmp/repos/myrepo.git").unwrap();
         assert_eq!(scheme, "fs");
@@ -139,6 +208,26 @@ mod tests {
         let (scheme, root) = parse_url("opendal://memory").unwrap();
         assert_eq!(scheme, "memory");
         assert_eq!(root, "/");
+    }
+
+    #[test]
+    fn from_url_and_env_rejects_missing_required_path_segment() {
+        let err = RemoteConfig::from_url_and_env("opendal://s3/").unwrap_err();
+        assert!(err.to_string().contains("bucket"));
+    }
+
+    #[test]
+    #[serial]
+    fn from_url_and_env_keeps_env_bucket_over_url_bucket() {
+        unsafe {
+            std::env::set_var("OPENDAL_S3_BUCKET", "env-bucket");
+        }
+        let cfg = RemoteConfig::from_url_and_env("opendal://s3/url-bucket/repos/myrepo.git").unwrap();
+        assert_eq!(cfg.params.get("bucket").map(String::as_str), Some("env-bucket"));
+        assert_eq!(cfg.root, "/repos/myrepo.git");
+        unsafe {
+            std::env::remove_var("OPENDAL_S3_BUCKET");
+        }
     }
 
     #[test]

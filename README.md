@@ -131,6 +131,10 @@ opendal://<scheme>/<root-path>
 | `scheme` | OpenDAL backend: `s3`, `gcs`, `azblob`, `gdrive`, `fs` |
 | `root-path` | Path inside the backend that acts as the repository root |
 
+For bucketed/container backends (`s3`, `gcs`, `azblob`), the first path
+segment is used as the bucket/container name and the rest is the repository
+root. Example: `opendal://s3/my-bucket/repos/myrepo.git`.
+
 The `memory` backend exists only for unit tests and single-process debugging.
 It is not suitable for normal Git operations because each helper invocation gets
 an isolated in-memory store.
@@ -153,7 +157,7 @@ This keeps credentials out of git-config and out of repository history.
 
 ```bash
 # Configure the remote
-git remote add origin opendal://s3/my-git-repos/myrepo.git
+git remote add origin opendal://s3/my-git-bucket/myrepo.git
 
 # Set credentials
 export OPENDAL_S3_BUCKET=my-git-bucket
@@ -163,7 +167,7 @@ export AWS_SECRET_ACCESS_KEY=...
 
 # Use normally
 git push origin main
-git clone opendal://s3/my-git-repos/myrepo.git
+git clone opendal://s3/my-git-bucket/myrepo.git
 ```
 
 For S3-compatible endpoints (MinIO, R2, etc.):
