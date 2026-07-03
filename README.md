@@ -131,6 +131,10 @@ opendal://<scheme>/<root-path>
 | `scheme` | OpenDAL backend: `s3`, `gcs`, `azblob`, `gdrive`, `fs` |
 | `root-path` | Path inside the backend that acts as the repository root |
 
+For bucketed/container backends (`s3`, `gcs`, `azblob`), the first path
+segment is used as the bucket/container name and the rest is the repository
+root. Example: `opendal://s3/my-bucket/repos/myrepo`.
+
 The `memory` backend exists only for unit tests and single-process debugging.
 It is not suitable for normal Git operations because each helper invocation gets
 an isolated in-memory store.
@@ -153,7 +157,7 @@ This keeps credentials out of git-config and out of repository history.
 
 ```bash
 # Configure the remote
-git remote add origin opendal://s3/my-git-repos/myrepo.git
+git remote add origin opendal://s3/my-git-bucket/myrepo
 
 # Set credentials
 export OPENDAL_S3_BUCKET=my-git-bucket
@@ -165,7 +169,7 @@ export OPENDAL_S3_ENDPOINT=https://my-minio.example.com
 
 # Use normally
 git push origin main
-git clone opendal://s3/my-git-repos/myrepo.git
+git clone opendal://s3/my-git-bucket/myrepo
 ```
 
 ---
@@ -173,7 +177,7 @@ git clone opendal://s3/my-git-repos/myrepo.git
 ### Google Cloud Storage
 
 ```bash
-git remote add origin opendal://gcs/my-git-repos/myrepo.git
+git remote add origin opendal://gcs/my-git-repos/myrepo
 
 export OPENDAL_GCS_BUCKET=my-gcs-bucket
 export OPENDAL_GCS_CREDENTIAL_PATH=/path/to/service-account.json
@@ -189,7 +193,7 @@ git push origin main
 ### Azure Blob Storage
 
 ```bash
-git remote add origin opendal://azblob/my-git-repos/myrepo.git
+git remote add origin opendal://azblob/my-git-repos/myrepo
 
 export OPENDAL_AZBLOB_CONTAINER=my-git-container
 export OPENDAL_AZBLOB_ACCOUNT_NAME=myaccount
@@ -205,10 +209,10 @@ git push origin main
 ### Local filesystem (testing)
 
 ```bash
-git remote add origin opendal://fs/tmp/my-bare-repos/myrepo.git
+git remote add origin opendal://fs/tmp/my-bare-repos/myrepo
 
 git push origin main
-git clone opendal://fs/tmp/my-bare-repos/myrepo.git local-clone
+git clone opendal://fs/tmp/my-bare-repos/myrepo local-clone
 ```
 
 ---

@@ -9,6 +9,10 @@
 //! The URL format is:
 //!   `opendal://<scheme>/<root-path>`
 //!
+//! For backends that require a bucket/container (`s3`, `gcs`, `azblob`), the
+//! first path segment supplies that name and the remaining path becomes the
+//! repository root, e.g. `opendal://s3/my-bucket/repos/myrepo`.
+//!
 //! Additional backend configuration is read from environment variables using
 //! the `OPENDAL_<SCHEME>_<KEY>` pattern.
 
