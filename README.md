@@ -133,7 +133,7 @@ opendal://<scheme>/<root-path>
 
 For bucketed/container backends (`s3`, `gcs`, `azblob`), the first path
 segment is used as the bucket/container name and the rest is the repository
-root. Example: `opendal://s3/my-bucket/repos/myrepo.git`.
+root. Example: `opendal://s3/my-bucket/repos/myrepo`.
 
 The `memory` backend exists only for unit tests and single-process debugging.
 It is not suitable for normal Git operations because each helper invocation gets
@@ -157,7 +157,7 @@ This keeps credentials out of git-config and out of repository history.
 
 ```bash
 # Configure the remote
-git remote add origin opendal://s3/my-git-bucket/myrepo.git
+git remote add origin opendal://s3/my-git-bucket/myrepo
 
 # Set credentials
 export OPENDAL_S3_BUCKET=my-git-bucket
@@ -167,7 +167,7 @@ export AWS_SECRET_ACCESS_KEY=...
 
 # Use normally
 git push origin main
-git clone opendal://s3/my-git-bucket/myrepo.git
+git clone opendal://s3/my-git-bucket/myrepo
 ```
 
 For S3-compatible endpoints (MinIO, R2, etc.):
@@ -182,7 +182,7 @@ export OPENDAL_S3_REGION=us-east-1   # required even for MinIO
 ### Google Cloud Storage
 
 ```bash
-git remote add origin opendal://gcs/my-git-repos/myrepo.git
+git remote add origin opendal://gcs/my-git-repos/myrepo
 
 export OPENDAL_GCS_BUCKET=my-gcs-bucket
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
@@ -196,7 +196,7 @@ git push origin main
 ### Azure Blob Storage
 
 ```bash
-git remote add origin opendal://azblob/my-git-repos/myrepo.git
+git remote add origin opendal://azblob/my-git-repos/myrepo
 
 export OPENDAL_AZBLOB_CONTAINER=my-git-container
 export OPENDAL_AZBLOB_ACCOUNT_NAME=myaccount
@@ -210,10 +210,10 @@ git push origin main
 ### Local filesystem (testing)
 
 ```bash
-git remote add origin opendal://fs/tmp/my-bare-repos/myrepo.git
+git remote add origin opendal://fs/tmp/my-bare-repos/myrepo
 
 git push origin main
-git clone opendal://fs/tmp/my-bare-repos/myrepo.git local-clone
+git clone opendal://fs/tmp/my-bare-repos/myrepo local-clone
 ```
 
 ---
