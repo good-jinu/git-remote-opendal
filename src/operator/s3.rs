@@ -4,8 +4,10 @@
 //! `opendal::Operator` configured for S3-compatible services (AWS S3,
 //! MinIO, Cloudflare R2, etc.).
 //!
-//! Required parameter: `bucket` (`OPENDAL_S3_BUCKET`). Optional params:
-//! `region`, `endpoint`, `access-key-id`, `secret-access-key`.
+//! Required parameter: `bucket`, supplied either as the first path segment of
+//! the remote URL (e.g. `opendal://s3/my-bucket/repos/myrepo`) or via
+//! `OPENDAL_S3_BUCKET`. Optional params: `region`, `endpoint`,
+//! `access-key-id`, `secret-access-key`.
 //!
 //! # Configuration
 //!
@@ -38,7 +40,7 @@ pub fn build_s3(cfg: &RemoteConfig) -> Result<Operator> {
 
     let bucket = cfg.params.get("bucket").ok_or_else(|| {
         anyhow!(
-            "S3 requires OPENDAL_S3_BUCKET.\n\
+            "S3 requires a bucket, e.g. opendal://s3/my-bucket/path or OPENDAL_S3_BUCKET.\n\
              Example: export OPENDAL_S3_BUCKET=my-git-bucket"
         )
     })?;
