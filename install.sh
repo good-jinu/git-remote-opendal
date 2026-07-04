@@ -33,7 +33,7 @@ OPTIONS:
     -h, --help            Print this help message
 
 ARGS:
-    VERSION               Tag to install (e.g. v0.2.1). Defaults to latest release.
+    VERSION               Tag to install (e.g. v0.3.0). Defaults to latest release.
 
 ENVIRONMENT:
     GIT_REMOTE_OPENDAL_INSTALL   Override install directory (default: ~/.git-remote-opendal)
