@@ -2,8 +2,10 @@
 //!
 //! Contains `build_gcs` which constructs an operator for Google Cloud Storage.
 //!
-//! Required param: `bucket` (`OPENDAL_GCS_BUCKET`). Optional:
-//! `credential`, `credential-path`, `endpoint`.
+//! Required param: `bucket`, supplied either as the first path segment of
+//! the remote URL (e.g. `opendal://gcs/my-bucket/repos/myrepo`) or via
+//! `OPENDAL_GCS_BUCKET`. Optional: `credential`, `credential-path`,
+//! `endpoint`.
 //!
 //! # Configuration
 //!
@@ -28,7 +30,7 @@ pub fn build_gcs(cfg: &RemoteConfig) -> Result<Operator> {
 
     let bucket = cfg.params.get("bucket").ok_or_else(|| {
         anyhow!(
-            "GCS requires OPENDAL_GCS_BUCKET.\n\
+            "GCS requires a bucket, e.g. opendal://gcs/my-bucket/path or OPENDAL_GCS_BUCKET.\n\
              Example: export OPENDAL_GCS_BUCKET=my-git-bucket"
         )
     })?;

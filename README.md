@@ -177,9 +177,8 @@ git clone opendal://s3/my-git-bucket/myrepo
 ### Google Cloud Storage
 
 ```bash
-git remote add origin opendal://gcs/my-git-repos/myrepo
+git remote add origin opendal://gcs/my-gcs-bucket/myrepo
 
-export OPENDAL_GCS_BUCKET=my-gcs-bucket
 export OPENDAL_GCS_CREDENTIAL_PATH=/path/to/service-account.json
 # or: export OPENDAL_GCS_CREDENTIAL=raw_json_string
 # Optional:
@@ -193,9 +192,8 @@ git push origin main
 ### Azure Blob Storage
 
 ```bash
-git remote add origin opendal://azblob/my-git-repos/myrepo
+git remote add origin opendal://azblob/my-git-container/myrepo
 
-export OPENDAL_AZBLOB_CONTAINER=my-git-container
 export OPENDAL_AZBLOB_ACCOUNT_NAME=myaccount
 export OPENDAL_AZBLOB_ACCOUNT_KEY=...
 # Optional:
@@ -220,7 +218,7 @@ git clone opendal://fs/tmp/my-bare-repos/myrepo local-clone
 ### Google Drive
 
 ```bash
-git remote add origin opendal://gdrive/my-git-repos/myrepo.git
+git remote add origin opendal://gdrive/my-git-repos/myrepo
 
 export OPENDAL_GDRIVE_CLIENT_ID=my-client-id
 export OPENDAL_GDRIVE_CLIENT_SECRET=my-client-secret

@@ -2,8 +2,10 @@
 //!
 //! Contains `build_azblob` which constructs an operator for Azure Blob Storage.
 //!
-//! Required param: `container` (`OPENDAL_AZBLOB_CONTAINER`).
-//! Optional: `account-name`, `account-key`, `endpoint`.
+//! Required param: `container`, supplied either as the first path segment of
+//! the remote URL (e.g. `opendal://azblob/my-container/repos/myrepo`) or via
+//! `OPENDAL_AZBLOB_CONTAINER`. Optional: `account-name`, `account-key`,
+//! `endpoint`.
 //!
 //! # Configuration
 //!
@@ -28,7 +30,7 @@ pub fn build_azblob(cfg: &RemoteConfig) -> Result<Operator> {
 
     let container = cfg.params.get("container").ok_or_else(|| {
         anyhow!(
-            "Azure Blob requires OPENDAL_AZBLOB_CONTAINER.\n\
+            "Azure Blob requires a container, e.g. opendal://azblob/my-container/path or OPENDAL_AZBLOB_CONTAINER.\n\
              Example: export OPENDAL_AZBLOB_CONTAINER=my-git-container"
         )
     })?;
