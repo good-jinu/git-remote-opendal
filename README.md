@@ -196,9 +196,6 @@ This keeps credentials out of git-config and out of repository history.
 ### Amazon S3 / S3-compatible (MinIO, Cloudflare R2, …)
 
 ```bash
-# Configure the remote
-git remote add origin opendal://s3/my-git-bucket/myrepo
-
 # Set credentials
 export OPENDAL_S3_BUCKET=my-git-bucket
 export OPENDAL_S3_REGION=us-east-1
@@ -207,8 +204,10 @@ export OPENDAL_S3_SECRET_ACCESS_KEY=...
 # Optional for S3-compatible endpoints (MinIO, R2, etc.):
 export OPENDAL_S3_ENDPOINT=https://my-minio.example.com
 
-# Use normally
-git push origin main
+# Configure the remote and publish the current branch
+git opendal setup --backend s3 --bucket my-git-bucket --path myrepo --push
+
+# Use normal Git commands afterward
 git clone opendal://s3/my-git-bucket/myrepo
 ```
 
