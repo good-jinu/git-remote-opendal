@@ -44,7 +44,7 @@ jobs:
 
       - name: Add redirect index.html
         run: |
-          echo '<meta http-equiv="refresh" content="0; url=git_remote_opendal/index.html">' > target/doc/index.html
+          echo '<meta http-equiv="refresh" content="0; url=git_opendal/index.html">' > target/doc/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

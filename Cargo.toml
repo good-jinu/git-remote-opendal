@@ -1,16 +1,22 @@
 [package]
-name = "git-remote-opendal"
-version = "0.3.0"
+name = "git-opendal"
+version = "0.4.0"
 edition = "2024"
 description = "Use any cloud storage as a Git remote via Apache OpenDAL"
 license = "MIT"
-repository = "https://github.com/good-jinu/git-remote-opendal"
+repository = "https://github.com/good-jinu/git-opendal"
 keywords = ["git", "opendal", "s3", "cloud-storage", "remote-helper"]
 categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "git-remote-opendal"
 path = "src/main.rs"
+
+# The workflow companion is installed alongside the remote helper so Git also
+# discovers it as `git opendal ...`.
+[[bin]]
+name = "git-opendal"
+path = "src/bin/git-opendal.rs"
 
 [dependencies]
 # OpenDAL 0.56 — requires Rust ≥ 1.85.
@@ -38,6 +44,9 @@ bytes = "1"
 # Error handling
 anyhow = "1"
 thiserror = "1"
+
+# Workflow CLI for the companion `git-opendal` executable.
+clap = { version = "4.5", features = ["derive", "wrap_help"] }
 
 # Unique identifiers
 uuid = { version = "1", features = ["v4"] }
