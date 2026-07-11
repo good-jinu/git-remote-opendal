@@ -187,6 +187,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn from_url_and_env_extracts_s3_bucket_from_path() {
         let cfg = RemoteConfig::from_url_and_env("opendal://s3/my-bucket/repos/myrepo.git").unwrap();
         assert_eq!(cfg.scheme, "s3");

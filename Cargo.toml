@@ -12,6 +12,12 @@ categories = ["command-line-utilities", "development-tools"]
 name = "git-remote-opendal"
 path = "src/main.rs"
 
+# The workflow companion is installed alongside the remote helper so Git also
+# discovers it as `git opendal ...`.
+[[bin]]
+name = "git-opendal"
+path = "src/bin/git-opendal.rs"
+
 [dependencies]
 # OpenDAL 0.56 — requires Rust ≥ 1.85.
 # Install a modern toolchain: rustup install stable && rustup default stable
@@ -38,6 +44,9 @@ bytes = "1"
 # Error handling
 anyhow = "1"
 thiserror = "1"
+
+# Workflow CLI for the companion `git-opendal` executable.
+clap = { version = "4.5", features = ["derive", "wrap_help"] }
 
 # Unique identifiers
 uuid = { version = "1", features = ["v4"] }

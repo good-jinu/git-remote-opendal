@@ -4,6 +4,11 @@ Use any cloud storage — **S3, GCS, Azure Blob, local filesystem, and [50+ more
 
 Backed by [Apache OpenDAL™](https://opendal.apache.org), one unified API for all storage.
 
+One installation provides two Git extensions:
+
+- `git-remote-opendal` is the transport Git starts automatically for `opendal://` remotes.
+- `git-opendal` is available as `git opendal ...` for setup, diagnostics, and first-push workflows.
+
 ---
 
 ## How it works
@@ -18,6 +23,17 @@ The helper implements the **`import`/`export`** capability pair:
 - **Fetch/Clone** (`git fetch`, `git clone`): helper downloads all stored bundles
   in order → pipes them through `git bundle unbundle` → feeds the resulting
   fast-import stream back to git.
+
+The companion command does not replace normal Git commands or reimplement
+transport. It only makes setup and operations easier:
+
+```sh
+git opendal setup --backend fs --path /tmp/my-git-remotes/myrepo --push
+git opendal doctor --backend fs
+git opendal status --probe
+```
+
+After setup, use ordinary `git clone`, `git fetch`, `git pull`, and `git push`.
 
 ### Storage layout (inside the backend root)
 
@@ -47,7 +63,8 @@ The quickest way to get started on **macOS** and **Linux**:
 curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/install.sh | sh
 ```
 
-This detects your platform, downloads the right pre-built binary from GitHub Releases, and optionally adds it to your `PATH`.
+This detects your platform, downloads the release archive containing both Git
+extensions, and optionally adds them to your `PATH`.
 
 **Install a specific version:**
 
@@ -85,8 +102,10 @@ Linux binaries are statically linked (musl) — no glibc dependency.
 # Example for Linux x86_64
 VERSION=v0.1.0
 curl -fsSL "https://github.com/good-jinu/git-remote-opendal/releases/download/$VERSION/git-remote-opendal-$VERSION-x86_64-unknown-linux-musl.tar.gz" \
-  | tar -xz --strip-components=1 -C ~/.local/bin git-remote-opendal-$VERSION-x86_64-unknown-linux-musl/git-remote-opendal
+  | tar -xz --strip-components=1 -C ~/.local/bin
 ```
+
+This extracts both `git-remote-opendal` and `git-opendal`.
 
 Checksums are published alongside each release as `SHA256SUMS.txt`.
 
@@ -94,7 +113,8 @@ Checksums are published alongside each release as `SHA256SUMS.txt`.
 
 ### Option 3 — Install via Cargo (crates.io)
 
-If you already have Rust and Cargo installed, you can install the binary directly from [crates.io](https://crates.io):
+If you already have Rust and Cargo installed, one package installs both
+executables directly from [crates.io](https://crates.io):
 
 ```sh
 cargo install --locked git-remote-opendal
@@ -112,13 +132,33 @@ To build and install the binary directly from the source repository:
 git clone https://github.com/good-jinu/git-remote-opendal
 cd git-remote-opendal
 cargo build --release
-# Copy the binary to a directory on your PATH, for example:
-cp target/release/git-remote-opendal ~/.local/bin/
+# Copy both binaries to a directory on your PATH, for example:
+cp target/release/git-remote-opendal target/release/git-opendal ~/.local/bin/
 ```
 
 ---
 
 ## Usage
+
+### Guided setup with `git opendal`
+
+The workflow command validates Git and the helper, builds the remote URL,
+registers it, and can bootstrap the first push. It is installed as both
+`git-opendal` and the Git subcommand `git opendal`.
+
+```bash
+# Local filesystem
+git opendal setup --backend fs --path /tmp/my-bare-repos/myrepo --push
+
+# S3, GCS, and Azure Blob require --bucket (the Azure value is a container)
+git opendal setup --backend s3 --bucket my-git-bucket --path repos/myrepo --push
+
+# Validate prerequisites and credentials without changing a repository
+git opendal doctor --backend s3
+```
+
+Use `git opendal --help` for `bootstrap`, `status`, `clone`, `url`, and
+backend configuration guidance.
 
 ### URL format
 

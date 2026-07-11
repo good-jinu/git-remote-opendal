@@ -31,7 +31,7 @@ conventions you should be aware of before sending a patch.
 # Install directly into your PATH for end-to-end smoke tests
 cargo install --path .
 
-# Or build a release binary without installing
+# Or build both release binaries without installing
 cargo build --release
 ```
 
@@ -44,6 +44,11 @@ cargo test
 ```
 
 Unit tests live as `#[cfg(test)]` modules inside each source file.
+
+`cargo install --path .` installs both `git-remote-opendal` (the transport)
+and `git-opendal` (available as `git opendal ...`). Keep the latter focused on
+setup, validation, and diagnostics; storage and remote-helper protocol changes
+belong in the former.
 
 ### Local smoke test (filesystem backend)
 
@@ -141,6 +146,7 @@ no server-side locking.  If you add locking, do it inside `src/storage.rs`.
 | File | Purpose |
 |------|---------|
 | [`src/main.rs`](src/main.rs) | CLI entry point, tracing setup, operator construction |
+| [`src/bin/git-opendal.rs`](src/bin/git-opendal.rs) | Setup, diagnostics, URL construction, and first-push workflow |
 | [`src/config.rs`](src/config.rs) | URL parsing and parameter resolution |
 | [`src/operator.rs`](src/operator.rs) | Builds `opendal::Operator` per scheme |
 | [`src/storage.rs`](src/storage.rs) | Storage layout helpers and `RefsStore` |

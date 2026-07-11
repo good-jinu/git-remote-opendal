@@ -1,6 +1,6 @@
 #!/bin/sh
 # Copyright the git-remote-opendal authors. MIT license.
-# Install git-remote-opendal – a Git remote helper backed by Apache OpenDAL.
+# Install the OpenDAL Git extensions: the remote helper and workflow command.
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/install.sh | sh
@@ -9,10 +9,12 @@
 set -e
 
 BINARY_NAME="git-remote-opendal"
+WORKFLOW_BINARY="git-opendal"
 GITHUB_REPO="good-jinu/git-remote-opendal"
 INSTALL_DIR="${GIT_REMOTE_OPENDAL_INSTALL:-$HOME/.git-remote-opendal}"
 BIN_DIR="$INSTALL_DIR/bin"
 EXE="$BIN_DIR/$BINARY_NAME"
+WORKFLOW_EXE="$BIN_DIR/$WORKFLOW_BINARY"
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -29,7 +31,7 @@ USAGE:
 
 OPTIONS:
     -y, --yes             Skip interactive prompts and add to PATH automatically
-    --no-modify-path      Do not modify shell profile to add $BINARY_NAME to PATH
+    --no-modify-path      Do not modify shell profile to add the Git extensions to PATH
     -h, --help            Print this help message
 
 ARGS:
@@ -109,7 +111,7 @@ if [ -z "$version" ]; then
     fi
 fi
 
-say "Installing $BINARY_NAME $version"
+say "Installing $BINARY_NAME and $WORKFLOW_BINARY $version"
 
 # ── build download URL ───────────────────────────────────────────────────────
 
@@ -143,6 +145,7 @@ case "$ext" in
         # The archive contains a single top-level directory
         extracted=$(find "$tmp_dir" -maxdepth 1 -mindepth 1 -type d | head -n 1)
         mv "$extracted/$BINARY_NAME" "$EXE"
+        mv "$extracted/$WORKFLOW_BINARY" "$BIN_DIR/$WORKFLOW_BINARY"
         ;;
     zip)
         if command -v unzip >/dev/null 2>&1; then
@@ -154,12 +157,16 @@ case "$ext" in
         fi
         extracted=$(find "$tmp_dir" -maxdepth 1 -mindepth 1 -type d | head -n 1)
         mv "$extracted/${BINARY_NAME}.exe" "${EXE}.exe"
+        mv "$extracted/${WORKFLOW_BINARY}.exe" "${WORKFLOW_EXE}.exe"
         EXE="${EXE}.exe"
+        WORKFLOW_EXE="${WORKFLOW_EXE}.exe"
         ;;
 esac
 
 chmod +x "$EXE"
+chmod +x "$WORKFLOW_EXE" 2>/dev/null || true
 say "$BINARY_NAME installed to $EXE"
+say "$WORKFLOW_BINARY installed to $WORKFLOW_EXE"
 
 # ── verify ───────────────────────────────────────────────────────────────────
 
@@ -171,7 +178,7 @@ fi
 # ── PATH setup ───────────────────────────────────────────────────────────────
 
 add_to_path_line() {
-    printf '\n# git-remote-opendal\nexport PATH="%s:$PATH"\n' "$BIN_DIR"
+    printf '\n# OpenDAL Git extensions\nexport PATH="%s:$PATH"\n' "$BIN_DIR"
 }
 
 if command -v "$BINARY_NAME" >/dev/null 2>&1; then
@@ -221,12 +228,12 @@ fi
 # ── done ─────────────────────────────────────────────────────────────────────
 
 echo ""
-echo "$BINARY_NAME was installed successfully!"
+echo "OpenDAL Git extensions were installed successfully!"
 echo ""
 if command -v "$BINARY_NAME" >/dev/null 2>&1; then
-    echo "Run '$BINARY_NAME --help' to get started."
+    echo "Run 'git opendal --help' to get started."
 else
-    echo "Run '$EXE --help' to get started."
+    echo "Run '$WORKFLOW_EXE --help' to get started."
     echo "(You may need to restart your shell or run: export PATH=\"$BIN_DIR:\$PATH\")"
 fi
 echo ""

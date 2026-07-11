@@ -6,7 +6,8 @@ capture immediately useful, discoverable facts for an AI so it can make
 productive edits without guessing project conventions.
 
 - Language: Rust (async, tokio). Binary invoked by Git as `git-remote-opendal`.
-- Entry point: `src/main.rs` (parses args, builds operator, runs helper state machine).
+- Transport entry point: `src/main.rs` (parses args, builds operator, runs helper state machine).
+- Workflow entry point: `src/bin/git-opendal.rs`, installed as `git-opendal` and invoked by Git as `git opendal ...`.
 
 Core components (read across these files to understand flows):
 
@@ -54,6 +55,11 @@ Developer workflows (commands discovered from README / files):
   tracing (goes to stderr):
   export GIT_REMOTE_OPENDAL_LOG=debug
 
+- One installation, two Git extensions:
+
+  cargo install --path .
+  git opendal setup --backend fs --path /tmp/my-bare-repos/myrepo.git --push
+
 - Manual smoke (local fs):
   git remote add origin opendal://fs/tmp/my-bare-repos/myrepo.git
   git push origin main
@@ -90,6 +96,9 @@ Extensibility notes (common edits you may be asked to make):
   format—update read/write logic and consider migration when changing it.
 - Protocol changes: `src/protocol.rs` is the single place for parsing and
   writing lines. Modifying it affects `helper.rs` heavily.
+- Workflow changes: `src/bin/git-opendal.rs` may validate tools and credentials,
+  construct URLs, register remotes, bootstrap a push, and report health. It
+  must not duplicate transport or storage behavior from the remote helper.
 
 Where to look first for a change request
 - If it's about config/env handling: `src/config.rs`.
