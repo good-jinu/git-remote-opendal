@@ -69,7 +69,7 @@ extensions, and optionally adds them to your `PATH`.
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/good-jinu/git-opendal/main/install.sh | sh -s -- v0.3.0
+curl -fsSL https://raw.githubusercontent.com/good-jinu/git-opendal/main/install.sh | sh -s -- v0.4.0
 ```
 
 **Non-interactive (CI / scripts):**
