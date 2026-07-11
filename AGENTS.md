@@ -1,4 +1,4 @@
-## git-remote-opendal
+## git-opendal
 
 This project is a Git remote helper that stores repositories on any OpenDAL
 backend (S3, GCS, Azure Blob, local fs, etc.). The goal of this file is to

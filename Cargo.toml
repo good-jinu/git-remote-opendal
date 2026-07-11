@@ -1,10 +1,10 @@
 [package]
-name = "git-remote-opendal"
+name = "git-opendal"
 version = "0.3.0"
 edition = "2024"
 description = "Use any cloud storage as a Git remote via Apache OpenDAL"
 license = "MIT"
-repository = "https://github.com/good-jinu/git-remote-opendal"
+repository = "https://github.com/good-jinu/git-opendal"
 keywords = ["git", "opendal", "s3", "cloud-storage", "remote-helper"]
 categories = ["command-line-utilities", "development-tools"]
 

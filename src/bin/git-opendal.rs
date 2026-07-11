@@ -311,7 +311,7 @@ fn doctor(backend: Option<Backend>) -> Result<()> {
     } else {
         failed = true;
         println!("fail git-remote-opendal: not found on PATH");
-        println!("     install this package with: cargo install --locked git-remote-opendal");
+        println!("     install this package with: cargo install --locked git-opendal");
     }
 
     if let Some(backend) = backend {

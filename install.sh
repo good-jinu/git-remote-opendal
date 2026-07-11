@@ -1,17 +1,18 @@
 #!/bin/sh
-# Copyright the git-remote-opendal authors. MIT license.
+# Copyright the git-opendal authors. MIT license.
 # Install the OpenDAL Git extensions: the remote helper and workflow command.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/install.sh | sh
-#   curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/install.sh | sh -s -- --version v0.1.0
+#   curl -fsSL https://raw.githubusercontent.com/good-jinu/git-opendal/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/good-jinu/git-opendal/main/install.sh | sh -s -- --version v0.1.0
 
 set -e
 
+PRODUCT_NAME="git-opendal"
 BINARY_NAME="git-remote-opendal"
 WORKFLOW_BINARY="git-opendal"
-GITHUB_REPO="good-jinu/git-remote-opendal"
-INSTALL_DIR="${GIT_REMOTE_OPENDAL_INSTALL:-$HOME/.git-remote-opendal}"
+GITHUB_REPO="good-jinu/git-opendal"
+INSTALL_DIR="${GIT_OPENDAL_INSTALL:-${GIT_REMOTE_OPENDAL_INSTALL:-$HOME/.git-opendal}}"
 BIN_DIR="$INSTALL_DIR/bin"
 EXE="$BIN_DIR/$BINARY_NAME"
 WORKFLOW_EXE="$BIN_DIR/$WORKFLOW_BINARY"
@@ -24,7 +25,7 @@ need() { command -v "$1" >/dev/null 2>&1 || err "'$1' is required but not found 
 
 print_help_and_exit() {
     cat <<EOF
-Install script for $BINARY_NAME
+Install script for $PRODUCT_NAME
 
 USAGE:
     install.sh [OPTIONS] [VERSION]
@@ -38,7 +39,8 @@ ARGS:
     VERSION               Tag to install (e.g. v0.3.0). Defaults to latest release.
 
 ENVIRONMENT:
-    GIT_REMOTE_OPENDAL_INSTALL   Override install directory (default: ~/.git-remote-opendal)
+    GIT_OPENDAL_INSTALL          Override install directory (default: ~/.git-opendal)
+    GIT_REMOTE_OPENDAL_INSTALL   Deprecated alias for GIT_OPENDAL_INSTALL
 
 EOF
     echo "$BINARY_NAME was NOT installed."
@@ -122,7 +124,7 @@ case "$target" in
     *)         ext="tar.gz" ;;
 esac
 
-archive="${BINARY_NAME}-${version}-${target}.${ext}"
+archive="${PRODUCT_NAME}-${version}-${target}.${ext}"
 url="https://github.com/$GITHUB_REPO/releases/download/$version/$archive"
 
 say "Target : $target"
@@ -170,8 +172,8 @@ say "$WORKFLOW_BINARY installed to $WORKFLOW_EXE"
 
 # ── verify ───────────────────────────────────────────────────────────────────
 
-if "$EXE" --version >/dev/null 2>&1; then
-    installed_version=$("$EXE" --version 2>&1 | head -n 1)
+if "$WORKFLOW_EXE" --version >/dev/null 2>&1; then
+    installed_version=$("$WORKFLOW_EXE" --version 2>&1 | head -n 1)
     say "Verified: $installed_version"
 fi
 
@@ -181,8 +183,8 @@ add_to_path_line() {
     printf '\n# OpenDAL Git extensions\nexport PATH="%s:$PATH"\n' "$BIN_DIR"
 }
 
-if command -v "$BINARY_NAME" >/dev/null 2>&1; then
-    say "$BINARY_NAME is already on your PATH — no changes needed."
+if command -v "$BINARY_NAME" >/dev/null 2>&1 && command -v "$WORKFLOW_BINARY" >/dev/null 2>&1; then
+    say "Both Git extensions are already on your PATH — no changes needed."
     modify_path=false
 fi
 
@@ -230,7 +232,7 @@ fi
 echo ""
 echo "OpenDAL Git extensions were installed successfully!"
 echo ""
-if command -v "$BINARY_NAME" >/dev/null 2>&1; then
+if command -v "$BINARY_NAME" >/dev/null 2>&1 && command -v "$WORKFLOW_BINARY" >/dev/null 2>&1; then
     echo "Run 'git opendal --help' to get started."
 else
     echo "Run '$WORKFLOW_EXE --help' to get started."

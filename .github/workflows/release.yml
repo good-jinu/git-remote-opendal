@@ -10,7 +10,9 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
-  BINARY_NAME: git-remote-opendal
+  PRODUCT_NAME: git-opendal
+  REMOTE_HELPER: git-remote-opendal
+  WORKFLOW_BINARY: git-opendal
 
 jobs:
   build:
@@ -73,11 +75,11 @@ jobs:
 
       - name: Build (native)
         if: "!matrix.cross"
-        run: cargo build --release --locked --target ${{ matrix.target }}
+        run: cargo build --release --locked --bins --target ${{ matrix.target }}
 
       - name: Build (cross)
         if: matrix.cross
-        run: cross build --release --locked --target ${{ matrix.target }}
+        run: cross build --release --locked --bins --target ${{ matrix.target }}
 
       # ── Package ──────────────────────────────────────────────────────────────
 
@@ -85,9 +87,10 @@ jobs:
         if: matrix.archive == 'tar.gz'
         shell: bash
         run: |
-          STAGING="$BINARY_NAME-${{ github.ref_name }}-${{ matrix.target }}"
+          STAGING="$PRODUCT_NAME-${{ github.ref_name }}-${{ matrix.target }}"
           mkdir -p "$STAGING"
-          cp "target/${{ matrix.target }}/release/$BINARY_NAME" "$STAGING/"
+          cp "target/${{ matrix.target }}/release/$REMOTE_HELPER" "$STAGING/"
+          cp "target/${{ matrix.target }}/release/$WORKFLOW_BINARY" "$STAGING/"
           cp README.md LICENSE "$STAGING/" 2>/dev/null || true
           tar -czf "$STAGING.tar.gz" "$STAGING"
           echo "ASSET=$STAGING.tar.gz" >> "$GITHUB_ENV"
@@ -96,9 +99,10 @@ jobs:
         if: matrix.archive == 'zip'
         shell: pwsh
         run: |
-          $staging = "$env:BINARY_NAME-${{ github.ref_name }}-${{ matrix.target }}"
+          $staging = "$env:PRODUCT_NAME-${{ github.ref_name }}-${{ matrix.target }}"
           New-Item -ItemType Directory -Path $staging | Out-Null
-          Copy-Item "target\${{ matrix.target }}\release\$env:BINARY_NAME.exe" $staging\
+          Copy-Item "target\${{ matrix.target }}\release\$env:REMOTE_HELPER.exe" $staging\
+          Copy-Item "target\${{ matrix.target }}\release\$env:WORKFLOW_BINARY.exe" $staging\
           if (Test-Path README.md) { Copy-Item README.md $staging\ }
           if (Test-Path LICENSE)   { Copy-Item LICENSE   $staging\ }
           Compress-Archive -Path $staging -DestinationPath "$staging.zip"

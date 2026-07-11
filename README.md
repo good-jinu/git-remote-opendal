@@ -1,4 +1,4 @@
-# git-remote-opendal
+# git-opendal
 
 Use any cloud storage — **S3, GCS, Azure Blob, local filesystem, and [50+ more](https://opendal.apache.org)** — as a plain Git remote.
 
@@ -60,7 +60,7 @@ After setup, use ordinary `git clone`, `git fetch`, `git pull`, and `git push`.
 The quickest way to get started on **macOS** and **Linux**:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/good-jinu/git-opendal/main/install.sh | sh
 ```
 
 This detects your platform, downloads the release archive containing both Git
@@ -69,13 +69,13 @@ extensions, and optionally adds them to your `PATH`.
 **Install a specific version:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/install.sh | sh -s -- v0.3.0
+curl -fsSL https://raw.githubusercontent.com/good-jinu/git-opendal/main/install.sh | sh -s -- v0.3.0
 ```
 
 **Non-interactive (CI / scripts):**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/install.sh | sh -s -- --yes
+curl -fsSL https://raw.githubusercontent.com/good-jinu/git-opendal/main/install.sh | sh -s -- --yes
 ```
 
 > The script supports `--no-modify-path` if you prefer to manage `PATH` yourself.
@@ -85,23 +85,23 @@ curl -fsSL https://raw.githubusercontent.com/good-jinu/git-remote-opendal/main/i
 ### Option 2 — Download a pre-built binary
 
 Download the archive for your platform from the
-[**Releases page**](https://github.com/good-jinu/git-remote-opendal/releases), then extract
+[**Releases page**](https://github.com/good-jinu/git-opendal/releases), then extract
 and place the binary somewhere on your `PATH`.
 
 | Platform | Archive |
 |----------|---------|
-| Linux x86\_64 | `git-remote-opendal-{version}-x86_64-unknown-linux-musl.tar.gz` |
-| Linux aarch64 | `git-remote-opendal-{version}-aarch64-unknown-linux-musl.tar.gz` |
-| macOS x86\_64 | `git-remote-opendal-{version}-x86_64-apple-darwin.tar.gz` |
-| macOS Apple Silicon | `git-remote-opendal-{version}-aarch64-apple-darwin.tar.gz` |
-| Windows x86\_64 | `git-remote-opendal-{version}-x86_64-pc-windows-msvc.zip` |
+| Linux x86\_64 | `git-opendal-{version}-x86_64-unknown-linux-musl.tar.gz` |
+| Linux aarch64 | `git-opendal-{version}-aarch64-unknown-linux-musl.tar.gz` |
+| macOS x86\_64 | `git-opendal-{version}-x86_64-apple-darwin.tar.gz` |
+| macOS Apple Silicon | `git-opendal-{version}-aarch64-apple-darwin.tar.gz` |
+| Windows x86\_64 | `git-opendal-{version}-x86_64-pc-windows-msvc.zip` |
 
 Linux binaries are statically linked (musl) — no glibc dependency.
 
 ```sh
 # Example for Linux x86_64
 VERSION=v0.1.0
-curl -fsSL "https://github.com/good-jinu/git-remote-opendal/releases/download/$VERSION/git-remote-opendal-$VERSION-x86_64-unknown-linux-musl.tar.gz" \
+curl -fsSL "https://github.com/good-jinu/git-opendal/releases/download/$VERSION/git-opendal-$VERSION-x86_64-unknown-linux-musl.tar.gz" \
   | tar -xz --strip-components=1 -C ~/.local/bin
 ```
 
@@ -117,7 +117,7 @@ If you already have Rust and Cargo installed, one package installs both
 executables directly from [crates.io](https://crates.io):
 
 ```sh
-cargo install --locked git-remote-opendal
+cargo install --locked git-opendal
 ```
 
 > **Note:** Requires Rust ≥ 1.85 (due to OpenDAL 0.56 MSRV). Make sure the Cargo binary directory (usually `~/.cargo/bin`) is in your `PATH`.
@@ -129,8 +129,8 @@ cargo install --locked git-remote-opendal
 To build and install the binary directly from the source repository:
 
 ```sh
-git clone https://github.com/good-jinu/git-remote-opendal
-cd git-remote-opendal
+git clone https://github.com/good-jinu/git-opendal
+cd git-opendal
 cargo build --release
 # Copy both binaries to a directory on your PATH, for example:
 cp target/release/git-remote-opendal target/release/git-opendal ~/.local/bin/
@@ -272,8 +272,8 @@ git push origin main
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to build locally, run tests,
-add a new backend, and the project conventions.
+Contributions are welcome. Please open an issue or pull request with a clear
+description and include tests when practical.
 
 ---
 
